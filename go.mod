@@ -1,6 +1,6 @@
-module github.com/pkg/sftp
+module github.com/polyfloyd/sftp
 
-go 1.15
+go 1.21
 
 require (
 	github.com/kr/fs v0.1.0
