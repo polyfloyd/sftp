@@ -2090,20 +2090,20 @@ func (f *File) Sync() error {
 // normaliseError normalises an error into a more standard form that can be
 // checked against stdlib errors like io.EOF or os.ErrNotExist.
 func normaliseError(err error) error {
-	switch err := err.(type) {
-	case *StatusError:
-		switch err.Code {
-		case sshFxEOF:
-			return io.EOF
-		case sshFxNoSuchFile:
-			return os.ErrNotExist
-		case sshFxPermissionDenied:
-			return os.ErrPermission
-		case sshFxOk:
-			return nil
-		default:
-			return err
-		}
+	var sErr *StatusError
+	if !errors.As(err, &sErr) {
+		return err
+	}
+
+	switch sErr.Code {
+	case sshFxEOF:
+		return io.EOF
+	case sshFxNoSuchFile:
+		return fmt.Errorf("%w, %w", os.ErrNotExist, err)
+	case sshFxPermissionDenied:
+		return os.ErrPermission
+	case sshFxOk:
+		return nil
 	default:
 		return err
 	}
